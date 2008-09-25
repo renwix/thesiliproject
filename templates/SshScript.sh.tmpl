@@ -1,0 +1,67 @@
+<@ # -*-perl-*-
+
+# gpl
+# 
+#  Author: Renwix (renwix@gmail.com)
+#  Maintainer: Renwix
+#  Copyright (C) 2008 Renwix, all rights reserved.
+#  Created: Tue Sep 23 23:52:17 MDT 2008
+# 
+# 
+#=======================================================================
+# 
+# This file is part of theSiliProject, a humorous software organization,
+# design and development toolkit.
+# 
+# theSiliProject is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# theSiliProject is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with theSiliProject. If not, see <http://www.gnu.org/licenses/>.
+# 
+#=======================================================================
+# 
+# /gpl
+
+# $xfmpipe = [{ command => "pp -s '<@' -e '@>'" }]
+@><: # -*-sh-*-
+use Helpers::shellHelpers; # $xfmpipe = [{command => 'pp.pl'}, {command => m4w, chmod => '+x' }];
+use Helpers::sshHelpers; 
+
+#
+# The syntax for getopts in the next block is:
+#  ([-]a,[-]aVariableName)
+#  where
+#  ([boolean if '-', otherwise parse a value from command line]<command line argument>, [required if '-']<script variable name>)
+#  
+print Helpers::shellHelpers::shellScript(getopts => "(h, -host),(u, -user)",
+				      r => [required_variables],
+				      suppressChangeQuote => true);
+:>
+
+#
+# Use this location for running any code locally before running the
+# remote actions. Good for ASSERTs or directory derivations
+# 
+
+# ASSERT
+if test -z "$_my_shell_var"; then
+    cleanup 0 "my_shell_var is not set - exiting quietly"
+fi
+
+<:= Helpers::sshHelpers::sshScriptOnly() :>
+
+#
+# The code to execute remotely should be inside the sshScript tags
+# 
+
+<:= Helpers::sshHelpers::endSshShellScript() :>
+
+    

@@ -1,0 +1,44 @@
+# @configure_input@                                     -*- shell-script -*-
+# Configurable variable values for theSiliProject test suite.
+# Shamelessly "borrowed" from GNU tar.
+
+# gpl
+# 
+#  Author: Renwix (renwix@gmail.com)
+#  Maintainer: Renwix
+#  Copyright (C) 2008 Renwix, all rights reserved.
+#  Created: Tue Sep 23 23:52:17 MDT 2008
+# 
+# 
+#=======================================================================
+# 
+# This file is part of theSiliProject, a humorous software organization,
+# design and development toolkit.
+# 
+# theSiliProject is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# theSiliProject is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with theSiliProject. If not, see <http://www.gnu.org/licenses/>.
+# 
+#=======================================================================
+# 
+# /gpl
+
+# use this file to define env vars prior to running .at tests in the
+# tests directory.
+
+PATH=@abs_builddir@:@abs_top_builddir@/src:@abs_top_srcdir@/build-aux:$top_srcdir:$srcdir:$PATH
+
+XFAILFILE=$abs_builddir/.badversion
+
+trap "test -r $XFAILFILE && cat $XFAILFILE; exit $?" 1 2 13 15
+
+

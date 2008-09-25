@@ -1,0 +1,14 @@
+#
+# Function:	docmd
+#
+# Description:	a generic wrapper for function eval
+# y
+docmd () {
+  test $# -lt 1 && return
+  eval "echo '$*'"
+  eval $*
+  RC=$?
+  test $RC -ne 0 &&
+	cleanup $RC command \"$*\" returned with error code $RC
+  return 0
+}

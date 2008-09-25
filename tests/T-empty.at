@@ -1,0 +1,8 @@
+dnl -*-m4-*-
+dnl The general format for this file is to m4_include all the tests in
+dnl the current directory (as necessary). Each of those files should have
+dnl a AT _ SETUP and an AT _ CLEANUP block in it
+
+
+echo testing T-empty.at
+

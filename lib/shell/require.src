@@ -1,0 +1,13 @@
+# -*-sh-*-
+
+require () {
+  while test $# -gt 0; do
+	derived=$(eval "echo \$"$1)
+	if test -z "$derived"; then
+      printmsg \$${1} not defined
+      usage
+	fi
+	shift
+  done
+}
+

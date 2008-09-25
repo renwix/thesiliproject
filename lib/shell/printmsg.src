@@ -1,0 +1,13 @@
+# Function:	printmsg   -*-sh-*-
+#
+# Description:	generic error reporting routine.
+#               BEWARE, white space is stripped and replaced with single spaces
+#
+printmsg () {
+  test -z "${QUIET}" && return
+  if test $# -ge 1; then
+    PRINTDASHN -n $PROGNAME:\($$\) >&2
+    while test $# -gt 0; do PRINTDASHN -n " "$1 >&2 ; shift ; done
+    echo . >&2
+  fi
+}

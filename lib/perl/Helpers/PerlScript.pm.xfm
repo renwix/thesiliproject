@@ -1,0 +1,503 @@
+<: # -*-perl-*-
+
+# gpl
+# 
+#  Author: Renwix (renwix@gmail.com)
+#  Maintainer: Renwix
+#  Copyright (C) 2008 Renwix, all rights reserved.
+#  Created: Tue Sep 23 23:52:17 MDT 2008
+# 
+# 
+#=======================================================================
+# 
+# This file is part of theSiliProject, a humorous software organization,
+# design and development toolkit.
+# 
+# theSiliProject is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# theSiliProject is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with theSiliProject. If not, see <http://www.gnu.org/licenses/>.
+# 
+#=======================================================================
+# 
+# /gpl
+
+# $xfmpipe = [{ command => 'pp.pl' }]
+use Helpers::PerlObject;
+my $po = Helpers::PerlObject->new(name => 'Helpers::PerlScript',
+                                   include => ['Helpers::shell'],
+                                  description => 'Helper for generating PerlScripts');
+
+$po->setMembers([{ name => 'name', description => 'The name of this PerlScript - ends up in the POD for this script' },
+                 { name => 'description', description => 'The description of this PerlScript - ends up in the POD for this script' },
+                 { name => 'include', description => 'An array ref listing all the libs that this library depends on', ref => 'ARRAY' },
+                 { name => 'perl5lib', description => 'PERL5LIB overrides. Use this instead of use lib - which you probably should not use anyway.', ref => 'ARRAY', default => '[]' },
+                 { name => 'getopts', 
+                   ref => 'ARRAY',
+                   description => 'An array of hashes containing "tag", "variable", "default", "nomy" and "required". 
+
+{ tag => "debug+", variable => "$debug", nomy => "t" } and { tag => "help", variable => "\$help" } are provied by default. 
+
+The tag is a Getopt::Long description of a commandline argument. The variable is the name of the variable that the commandline info should be saved into. nomy if set will not include a "my" on the front of the variable declaration (for scoping). The default sets the default value for that variable. And required defines whether the variable is required or not.' },
+                 { name => 'passThrough',
+                   description => 'A boolean, if specified, then the Getopt::Long::pass_throug flag is set, allowing pass through argument handling' },
+                 { name => 'suppressRequiredVariableCheck',
+                   description => 'If set to true, then the getopts fn will not try to generate a requirement statement.' },
+                 { name => 'date',
+                   description => 'the date that this compiler was run' },
+                 { name => 'isRemoteScript',
+                   description => 'If this is set, then some additional functions (remote_docmd, remote_docmdi) are included into the generated perlscript.' },
+                 ]);
+
+print $po->dump();
+:>
+
+require Exporter;
+@Helpers::PerlScript::ISA = qw(Exporter);
+@Helpers::PerlScript::EXPORT = qw(_envVar);
+
+sub _new {
+    my ($this) = @_;
+    # default $debug and $help options
+
+
+    unless ($this->getName()) {
+	my $name = $ENV{XFM_PATH_FILE};
+	$name =~ s/\.xfm$//;
+	$this->setName($name);
+    }
+    push @{$this->{getopts}}, ({ tag => "trace", 
+                                 variable => '$trace', 
+                                 default => 0,
+                                 nomy => 't',
+                                 description => 'The $trace command line flag turns on trace functionality'}, 
+                               { tag => "debug+", 
+                                 variable => '$debug', 
+                                 default => 0,
+                                 nomy => 't',
+                                 description => 'The $debug command line flag is additive and can be used with the &debugPrint subroutine'}, 
+                               { tag => "help", 
+                                 variable => '$help', 
+                                 default => 0,
+                                 description => 'The help command line flag will print the help message'}) 
+	if $this->{getopts};
+#    print STDERR "options: " , Dumper($this->getGetopts());
+
+    $this->setDate( scalar localtime );
+
+}
+
+sub dump {
+    <:= $po->contract( 'dump' => { description => 'function used to dump the actual PerlScript generated code', getopts => [] }); :>
+
+    my $ret = $this->_header();
+    $ret .= _Confess();
+    $ret .= Helpers::shell::printmsg();
+    $ret .= Helpers::shell::docmdi();
+    $ret .= Helpers::shell::docmd();
+    if ($this->getIsRemoteScript) {
+        $ret .= _remote_docmd();
+        $ret .= _remote_docmdi();
+    }
+    $ret .= _cleanup();
+    $ret .= $this->_getopts();
+    $ret .= _debugprint();
+    $ret .= _ASSERT();
+
+    $ret .= '
+sub print_usage {
+    if (scalar @_ > 0) {
+        print STDERR "@_\n";
+        exit(1);
+    } else {
+        pod2usage({ -exitval => 1, 
+                    -verbose => ($debug ? $debug : 1),
+                    -output  => \*STDERR});
+    }
+}
+';
+    return $ret;
+}
+
+sub pod {
+    <:= $po->contract( 'pod' => { description => 'function used to dump the actual PerlScript generated poddocs', getopts => [] }); :>
+    return $this->_pod();
+}
+
+
+sub _header {
+    <:= $po->contract( '_header' => { description => 'INTERNAL function used to dump the PerlScript generated header', getopts => [] }); :>
+
+    my $includes = '';
+    for my $inc (@{ $this->getPerl5lib }) {
+        $includes .= ' -I' . $inc;
+    }
+
+    my $ret = '#!/usr/bin/perl' . $includes . '
+
+use Carp;
+use Getopt::Long;
+use Data::Dumper;
+use Pod::Usage;
+our ($trace, $debug);
+
+';
+    my $raIncludes = $this->getInclude();
+    for my $include ( @$raIncludes ) {
+        $ret .= "use $include;\n";
+    }
+
+    return $ret;
+}
+
+sub _validateOptions {
+    <:= $po->contract( '_validateOptions' => { description => 'INTERNAL function used to confirm that the "getopts" data has all the correct information', getopts => [] }); :>
+
+    my $raGetopts = $this->getGetopts();
+    my $errorMessage = '';
+
+    for my $getopt ( @$raGetopts ) {
+        unless ($getopt->{description}) {
+            $errorMessage .= ", " if $errorMessage;
+            $errorMessage .= "'" . $getopt->{tag} . "'";
+        }
+    }
+    if ($errorMessage) {
+        Confess "The following options are defined, but do NOT have a description field: $errorMessage\n";
+    }
+}
+
+
+sub _getopts {
+    <:= $po->contract( '_getopts' => { description => 'INTERNAL function used to dump the PerlScript generated getopts', 
+                                       getopts => [] }) :>
+
+	if ($this->getGetopts()) {
+	    $this->_validateOptions();
+	    my ($varString, $getOptsString, $requiredString);
+
+	    my $raGetopts = $this->getGetopts();
+
+	    for my $getopt ( @$raGetopts ) {
+
+		my $var = $getopt->{variable};
+		$var =~ s/^\$//;
+		
+		# variable representation
+		if ($getopt->{nomy}) {
+		    $varString .= $getopt->{variable};
+		} else {
+		    $varString .= 'my ' . $getopt->{variable};
+		}
+
+		if (exists $getopt->{default}) {
+		    $varString .= ' = ' . '"' . $getopt->{default} . "\";\n";
+		} else {
+		    $varString .= ";\n";
+		}
+		$varString .= "$getopt->{variable} = \$ENV{$var} if \$ENV{$var};\n"; # slurp out of the environment if it exists
+
+
+		# GetOptions Representation
+<:
+                # this is something magic about the next line... Usually you wouldn't need the 3rd escape
+                # but for some reason, compilation of this file .xfm -> non.xfm eats one of these quotes,
+                # but it isn't that simple, it has to do with the environment. if the script is run against
+                # the regular build environment, you end up with the right thing (without the 3rd escape). If
+                # you run it under the limited environment in bootstrap/t/manualShell.sh you get the corrupted
+                # file. This is the only one I have seen it in so far. 
+:>
+		$getOptsString .= "\t'$getopt->{tag}'\t=> \\\$getopt->{variable},\n";
+
+		# requirements
+		unless ( $this->getSuppressRequiredVariableCheck ) {
+		    if ($getopt->{required}) {
+			$requiredString .= "unless ($getopt->{variable}) { printmsg \"$var is required\" ; print_usage() ; } \n";
+		    }
+		}
+	    }
+
+	    my $ret;
+            $ret .= "\nGetopt::Long::Configure( 'pass_through');\n\n" if $this->getPassThrough;
+	    $ret .= "$varString\nGetOptions( $getOptsString );\n\n";
+	    $ret .= "print_usage() if \$help;\n";
+	    $ret .= $requiredString if $requiredString;
+	    
+	    return $ret;
+	}
+}
+
+
+sub _pod {
+    <:= $po->contract( '_pod' => { description => 'INTERNAL function returns the canned pod for a script that uses this generator' } ); :>
+    my $pod = "
+\=pod
+
+\=head1 NAME
+
+";
+
+    $pod .= $this->getName();
+    $pod .= "    
+
+\=head1 SYNOPSIS
+
+";
+
+    $pod .= $this->getDescription();
+
+    my $raGetopts = $this->getGetopts();
+    if ($raGetopts && scalar @$raGetopts) {
+        $pod .= "
+
+\=head1 ARGUMENTS
+
+\=over 4
+
+";
+        for my $getopt ( @$raGetopts ) {
+            my $tag = "'" . $getopt->{tag} . "'";
+            $tag = "[REQUIRED] $tag" if ($getopt->{required});
+            $pod .= $this->_pod_item( marker => $tag,
+                                      text   => $getopt->{description} );
+        }
+        
+    $pod .= "
+
+\=back
+
+";
+    }
+
+    my $date = $this->getDate();
+    my $uname = `uname -a`;
+    $pod .= "
+
+\=head1 PERLSCRIPT GENERATED SCRIPTS
+
+This script was generated with the Helpers::PerlScript pre-compiler.
+
+This file was automatically generated from the file: $ENV{XFM_PATH_FILE} by
+$ENV{USER} on $ENV{HOSTNAME} ($uname) on $date.
+
+The following functions are included by default. The functions all have 
+prototypes that make the parens optional.
+
+\=over 4
+
+\=item printmsg (\@)
+
+Will print a formatted message to STDERR.
+
+\=item docmdi (\@)
+
+Will run a system command and ignore the return code
+
+\=item docmd (\@)
+
+Will run a system command and exit with the return code of the child process, if it is non-zero
+
+\=item debugPrint (\$\@)
+
+Use it like C<debugPrint 1, 'Some info message'> or C<debugPrint 2, 'Some trace message'> and
+it will print out a little more information than the printmsg command.
+
+\=back
+
+\=cut
+
+# ## This is autogenerated documentation
+";
+
+    
+    return $pod;
+}
+
+sub _pod_item {
+    <:= $po->contract( '_pod_item' => { description => 'INTERNAL function returns a pod item block', 
+                                        getopts => [{ name => 'marker', 
+                                                      description => 'the value that should follow the "=item" text. Defaults to *' },
+                                                    { name => 'text', 
+                                                      required => 1,
+                                                      description => 'the text that is the body of the "=item"' },
+                                                      ] }); :>    
+
+    return "
+=item $marker
+
+$text
+
+";
+}
+
+
+sub _ASSERT () {
+    my $o =<<'EOF';
+sub ASSERT ($@) { 
+    my $test_result = shift;
+    Confess @_ unless $test_result;
+}
+EOF
+
+}
+
+sub _debugprint () {
+    my $o =<<'EOF';
+sub debugPrint ($@) { 
+    my $level = shift;
+    if ($debug >= $level) {
+        my ($caller) = (caller(1))[3];
+        $caller = "[$caller]:" if $caller;
+        my $date = localtime;
+        print STDERR $caller . $date . ":" . basename($0) . ":($$): @_.\n" ;
+    }
+}
+EOF
+
+}
+
+sub _cleanup () {
+    my $o =<<'EOF';
+sub cleanup ($@) { 
+    my $exit_code = shift;
+    debugPrint( 1, @_ ) if scalar @_;
+    debugPrint( 1, "exiting with exit code = $exit_code" );
+    exit $exit_code;
+}
+EOF
+
+}
+
+sub _Confess () {
+    my $o =<<'EOF';
+use Term::ANSIColor qw(:constants);
+sub Confess (@) {confess BOLD, RED, @_, RESET}
+sub CONFESS (@) { Confess( @_ ) }
+sub Croak (@) {croak BOLD, RED, @_, RESET}
+sub Warn (@) { warn YELLOW, BOLD, ON_BLACK, "@_", RESET }
+EOF
+}
+
+sub _remote_docmd () {
+    my $o =<<'EOF';
+sub remote_docmd (@) { 
+    docmd "ssh -o StrictHostKeyChecking=no -o PreferredAuthentications=publickey $user\@$host '@_'";
+}
+EOF
+
+}
+
+sub _remote_docmdi () {
+    my $o =<<'EOF';
+sub remote_docmdi (@) { 
+    docmdi "ssh -o StrictHostKeyChecking=no -o PreferredAuthentications=publickey $user\@$host '@_'";
+}
+EOF
+
+}
+
+sub _envVar {
+    my $var = shift;
+    my $h = {
+	tag => $var,
+	variable => '$' . $var,
+	required => 't',
+	description => $_[0],
+	};
+    $h;
+}
+
+=pod
+
+=head1 Handling of Environment Variables
+
+The PerlScript default behaviour is to look in the process environment for a match to any getopt() variable.
+
+=cut
+
+
+sub _strip_blocks {
+    <:= $po->contract( '_strip_blocks' => { description => 'A function that will grab marked blocks of text out of a file and return it.',
+                                        getopts => [ { name => 'start_tag',
+                                                       description => 'The start of the block',
+                                                       default => '<psBlock>' },
+                                                     { name => 'end_tag',
+                                                       description => 'The end of the block',
+                                                       default => '</psBlock>' },
+                                                     { name => 'preserve_block',
+                                                       description => 'If set, then the block will include the start and end tags',
+                                                       default => 0 },
+                                                     { name => 'strip_comments',
+                                                       description => 'If set, then strip any comments out of the block',
+                                                       default => 0} ,
+                                                     { name => 'comment_char',
+                                                       description => 'The comment character that should be stripped from the block',
+                                                       default => '#' }
+                                                 ] } ); :>
+
+do {
+    my $o = q!                           
+sub _strip_blocks {
+    my $fh = shift;
+    my $doprint = 0;
+    my $out = '';
+    my $final = '';
+    my ($start_regexp, $end_regexp, $comment_regexp);
+
+    $comment_regexp = qr/^\s*! . $comment_char . q!( |\t){0,2}/;
+!;
+    if ($preserve_block) {
+$o .= q!    $start_regexp = qr{ ^.*(! . $start_tag . q!.*)$ }x;
+    $end_regexp   = qr{ ^(.*! . $end_tag   . q!).*$   }x;
+!;
+    } else {
+$o .= q!    $start_regexp = qr{ ^.*! . $start_tag . q!(.*)$ }x;
+    $end_regexp   = qr{ ^(.*)! . $end_tag . q!.*$   }x;
+!;
+    }
+$o .= q!
+    while(<$fh>){
+        if (s/$start_regexp/$1/) {
+            if (s/$end_regexp/$1/) {
+!; $o .= '                s/$comment_regexp//;
+' if $strip_comments;
+$o .= q!                $doprint = 0;
+                $out .= $_;
+                $final .= $out;
+                $out = '';
+            } else {
+!; $o .= '                s/$comment_regexp//;
+' if $strip_comments;
+$o .= q!                $doprint = 1;
+            }
+        } 
+        if (s/$end_regexp/$1/) {
+!; $o .= '            s/$comment_regexp//;
+' if $strip_comments;
+$o .= q!            $doprint = 0;
+            $out .= $_;
+            $final .= $out;
+            $out = '';
+        }
+        if ($doprint) {
+!; $o .= '            s/$comment_regexp//;
+' if $strip_comments;
+$o .= q!           $out .= $_;
+        }
+    }
+
+    return $final;
+}
+!;
+    return $o;
+};
+}
+
