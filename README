@@ -2,4 +2,25 @@ This directory contains theSiliProject, a humorous software
 organization, design and development toolkit.
 
 There is little funny in software development anymore. Source should
-be fun to read and write.
+be fun to read and write. So, just to keep us all amused (and on toes)
+this is written in Perl (which will really only make any sense after
+reading Mark Jason Dominus' Higher Order Perl. And even then... No
+matter, the point is to chuckle to yourself while reading the stack.
+
+More seriously, it is the first stages of a thingy I found on the web
+a while ago, but has gone missing... an RDF/OWL interpreter written in
+lisp (or scheme). It was a clever implementation for several reasons,
+but primarily because it borowed the concepts of OWL, but implemented
+them in s-expressions and some small, lightweight, recursive
+helpers. This project is along those lines too, but uses Perl's block
+structure, which should be a little more familiar to the average hack,
+especially when run through Data::Dumper.
+
+I use it for managing 10^100 different code lines, but I started
+wondering lately if the same trick couldn't be applied to browser
+"profiles". Manage different browsing profiles, so that, for example,
+when I go to http://news.google.com I might get my recommended stories
+from one profile, and the general page from a different profile. All
+without leaving my browser... But - that will have to be for a
+different project.
+
