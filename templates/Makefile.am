@@ -40,7 +40,7 @@ test_rule ::; @echo "relativePath is $(relativePath) top_srcdir is $(top_srcdir)
 
 
 
-TEMPLATE_LIST := PerlObject.pm.tmpl PerlScript.pm.tmpl Makefile.am.tmpl newModule.tmpl TestMakefile.tmpl ShellScript.sh.tmpl perlTestCase.t.tmpl Makefile.tmpl SshScript.sh.tmpl PerlDBScript.pm.tmpl
+TEMPLATE_LIST := PerlObject.pm.tmpl PerlScript.pm.tmpl TestMakefile.tmpl ShellScript.sh.tmpl perlTestCase.t.tmpl Makefile.tmpl SshScript.sh.tmpl PerlDBScript.pm.tmpl
 EXTRA_DIST = $(TEMPLATE_LIST)
 
 bindir=$(pkgdatadir)$(relativePath)
