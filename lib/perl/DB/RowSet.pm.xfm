@@ -39,11 +39,11 @@ my $po = Helpers::PerlObject->new (name => "DB::RowSet",
    use DB::OracleHandle;
    use DB::RowSet;
    
-   my $dbhandle = DB::OracleHandle->new(user => "$ENV{CONTROLLER_USER}",
-   				     password => "$ENV{CONTROLLER_PASSWD}",
-   				     SID => "$ENV{CONTROLLER_SID}",
-   				     host => "$ENV{CONTROLLER_HOST}",
-   				     port => "$ENV{CONTROLLER_PORT}");
+   my $dbhandle = DB::OracleHandle->new(user => "$ENV{DB_USER}",
+                                        password => "$ENV{DB_PASSWD}",
+                                        SID => "$ENV{DB_SID}",
+                                        host => "$ENV{DB_HOST}",
+                                        port => "$ENV{DB_PORT}");
    
    
    my $rowset = DB::RowSet->new(dbh => $dbhandle->getDbh(),
