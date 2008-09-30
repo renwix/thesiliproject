@@ -74,15 +74,15 @@ for x in /bin/echo /usr/bin/echo /usr/ucb/echo echo; do
     fi
 done
 
-MAKEINFO_REQUIRED_VERSION=4.2
-AC_MSG_CHECKING([for texinfo version >= ${MAKEINFO_REQUIRED_VERSION}])
-makeinfoVersion=`${MAKEINFO} --version | awk 'NR == 1 && $NF >= '${MAKEINFO_REQUIRED_VERSION}' {print $NF}'`
-if test -z "${makeinfoVersion=}"; then
-  AC_MSG_RESULT([no])
-  AC_MSG_ERROR([You need texinfo version >= ${MAKEINFO_REQUIRED_VERSION} .... See http://www.gnu.org/software/texinfo/])
-else
-  AC_MSG_RESULT([yes])
-fi
+dnl MAKEINFO_REQUIRED_VERSION=4.2
+dnl AC_MSG_CHECKING([for texinfo version >= ${MAKEINFO_REQUIRED_VERSION}])
+dnl makeinfoVersion=`${MAKEINFO} --version | awk 'NR == 1 && $NF >= '${MAKEINFO_REQUIRED_VERSION}' {print $NF}'`
+dnl if test -z "${makeinfoVersion=}"; then
+dnl   AC_MSG_RESULT([no])
+dnl   AC_MSG_ERROR([You need texinfo version >= ${MAKEINFO_REQUIRED_VERSION} .... See http://www.gnu.org/software/texinfo/])
+dnl else
+dnl   AC_MSG_RESULT([yes])
+dnl fi
 
 if test -z "$PRINTDASHN" ; then
    AC_MSG_ERROR([could find not an echo that understands the -n flag])
