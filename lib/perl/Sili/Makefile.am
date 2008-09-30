@@ -38,7 +38,7 @@ relativePath = $(shell tmp=`cd $(top_srcdir); pwd`; pwd | perl -ple "s,$$tmp,,")
 
 test_rule ::; @echo "relativePath is $(relativePath) top_srcdir is $(top_srcdir)"
 
-sili_files := NamedParams.pm Ness.pm
+sili_files := NamedParams.pm Ness.pm C.pm Q.pm
 
 bindir=$(pkgdatadir)$(relativePath)
 bin_SCRIPTS = $(sili_files)
