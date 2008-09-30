@@ -192,7 +192,7 @@ sub _get_objs [$tag:required, $list:required] {
 
 sub choose_silis {
 
-  require $ENV{SILID} || CONFESS $@;
+  require $ENV{SILID} || CONFESS "Sili requires the SILID variable to be set: $@";
   debugPrint 1, $ENV{SILID}, " ", Dumper($silis);
   $silis || USAGE "specify \$silid in $ENV{SILID}";
 
@@ -242,7 +242,7 @@ $version && version() && exit 0;
 $choose_silis && choose_silis() && exit 0;
 
 # load the definition
-require $sili || CONFESS $@;
+require $sili || CONFESS "Sili requires the SILI env var to be set: $@";
 if ($show_silis == 1) {
   show_silis( $silis ) && exit 0;
 }
