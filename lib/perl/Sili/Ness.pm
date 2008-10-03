@@ -29,6 +29,7 @@
 # /gpl
 
 package Sili::Ness;
+use strict;
 
 =pod
 
@@ -69,6 +70,7 @@ use Getopt::Long;
 use Term::ANSIColor qw(:constants);
 use Pod::Usage;
 use Exporter;
+our (@ISA, @EXPORT);
 @ISA = qw( Exporter );
 @EXPORT = qw( defineClass isObject debugPrint param members isa isSome CONFESS CROAK WARN USAGE getopts );
 
@@ -492,6 +494,7 @@ new class is nothing more than:
         isa => Sili::Ness,
         members( param( name => 'x',
                         doc => 'This is variable x',
+                        isa => 'Some::Object',
                         required => 1),
                  param( name => 'y', doc => 'This is a variable') );
 

@@ -170,11 +170,11 @@ FILTER {
   debugPrint( 3, "# OPTIONS: ", Dumper(\%options) );
 
   while ( $code =~ m! sub \s+ (\w*) \s* ( \(.+\) | [^{]* ) \{ !msx ) {
-
+      
     $ret .= $`; $code = $'; #'
 
     # match now contains 'sub <name> <description>' {
-
+          
     my ($name, $description) = ($1, $2);
     my $description_lines = 0; $description_lines++ while ( $description =~ /[\n\r\f]/g );
 
@@ -210,7 +210,6 @@ FILTER {
     if ($description) {
       $ret .= "sub $name ($prototype) { " . nl;
       $ret .= "my \$self = shift; " . nl if $options{ classes };
-      $ret .= "my \%_args = \@_; confess 'syntax error (named arguments required, but not provided: (' . \"\@_\" . ')) in call to " . ($name || '__ANON__') . "' if scalar \@_ \% 2 != 0; " . nl;
     } elsif ( $proto_found ) {
       $ret .= "sub $name ($prototype) { ";
       next;
@@ -218,8 +217,9 @@ FILTER {
       $ret .= "sub $name { ";
       next;
     }
-
-    $name ||= '__ANON__';
+  
+  $name ||= '__ANON__';
+  $ret .= "my \%_args = \@_; confess 'syntax error (named arguments required, but not provided: (' . \"\@_\" . ')) in call to $name' if scalar \@_ \% 2 != 0; " . nl;
 
     debugPrint( 2, "# $name DESCRIPTION ($description_lines) [$description]" );
     debugPrint( 3, "# $name ARGV ARRAY ", Dumper( \@argv ) );

@@ -1,4 +1,4 @@
-<:  # -*- perl -*-
+# -*- perl -*-
 
 # gpl
 # 
@@ -30,28 +30,23 @@
 # 
 # /gpl
 
-# $xfmpipe = [{command => "pp.pl" }];
-use Helpers::PerlObject; 
+package DB::OracleHandle;
+use DBI;
 
-my $po = Helpers::PerlObject->new (name => "DB::OracleHandle",
-				   isa => "DB::DBHandle",
-				   include => ['DBI'],
-				   description => "Wrapper for an Oracle DBIDatabase Handle.");
-
-$po->setMembers([{name => "SID", 
-		  description => "SID for the oracle instance to connect to"},
-		 {name => "port", 
-		  format => '\d+',
-		  description => "port for the oracle instance to connect to"},]); 
-:>
-
-<:= $po->dump(); :>
-
-sub _new {
-    <:= $po->dumpContract(method => "_new"); :>
-    $this->SUPER::_new(%args);
-    $this->setConnectString("dbi:Oracle:host=" . $this->getHost() . ";sid=" . $this->getSID() . ";port=" . $this->getPort() );
-    $this->connect();
+defineClass
+    isa => DB::DBHandle,
+    param( name => "SID", 
+           doc => "SID for the oracle instance to connect to" ),
+    param( name => "port", 
+           format => '\d+',
+	   doc => "port for the oracle instance to connect to" )
+;
+sub init {
+    my $self = shift;
+    $self->connectString("dbi:Oracle:host=" . $self->host() . 
+                         ";sid=" . $self->SID() . 
+                         ";port=" . $self->port() );
+    $self->connect();
 }
 
 
