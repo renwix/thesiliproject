@@ -60,17 +60,17 @@ M4_FLAGS        =       -I@abs_builddir@ \
 												-Dprefix=$(prefix) \
 												--prefix-builtins
 
-pmxfmfiles	= $(wildcard *.pm.xfm)
-nopmxfmfiles	= $(patsubst %.xfm,%,$(pmxfmfiles))
+# pmxfmfiles	= $(wildcard *.pm.xfm)
+# nopmxfmfiles	= $(patsubst %.xfm,%,$(pmxfmfiles))
 
-plxfmfiles	= $(wildcard *.pl.xfm)
-noplxfmfiles	= $(patsubst %.xfm,%,$(plxfmfiles))
+# plxfmfiles	= $(wildcard *.pl.xfm)
+# noplxfmfiles	= $(patsubst %.xfm,%,$(plxfmfiles))
 
-shxfmfiles	= $(wildcard *.sh.xfm)
-noshxfmfiles	= $(patsubst %.xfm,%,$(shxfmfiles))
+# shxfmfiles	= $(wildcard *.sh.xfm)
+# noshxfmfiles	= $(patsubst %.xfm,%,$(shxfmfiles))
 
-shm4files	= $(wildcard *.sh.m4)
-noshm4files	= $(patsubst %.m4,%,$(shm4files))
+# shm4files	= $(wildcard *.sh.m4)
+# noshm4files	= $(patsubst %.m4,%,$(shm4files))
 
 %.pm	:	%.pm.xfm Makefile $(HELPER_DEPS)
 	$(XFMPIPE) --file $< -dest $@ ; \

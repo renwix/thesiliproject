@@ -36,13 +36,21 @@ relativePath = $(shell tmp=`cd $(top_srcdir); pwd`; pwd | perl -ple "s,$$tmp,,")
 
 test_rule ::; @echo "relativePath is $(relativePath) top_srcdir is $(top_srcdir)"
 
-SHORTNAMESCRIPTS = template keyCleaner getMD tarchive sili
+# SHORTNAMESCRIPTS = template keyCleaner getMD tarchive sili
 
+# [fedora@localhost () thesiliproject]$ ls src/
+# getMD         keyCleaner         m4w        Makefile     pp     sili.pl      tarchive.pl      template.pl      xfmPipe.pl
+# getMD.pl      keyCleaner.pl      m4w.sh     Makefile.am  pp.pl  sili.pl.xfm  tarchive.pl.xfm  template.pl.xfm
+# getMD.pl.xfm  keyCleaner.pl.xfm  m4w.sh.m4  Makefile.in  sili   tarchive     template         xfmPipe
 
-bin_SCRIPTS = pp m4w xfmPipe $(noshm4files) $(noshxfmfiles) $(noplxfmfiles) $(SHORTNAMESCRIPTS) pp.pl m4w.sh xfmPipe.pl
-CLEANFILES = pp m4w xfmPipe $(noshm4files) $(noshxfmfiles) $(noplxfmfiles) $(SHORTNAMESCRIPTS) m4w.sh
+sources = getMD.pl.xfm keyCleaner.pl.xfm template.pl.xfm tarchive.pl.xfm sili.pl.xfm m4w.sh.m4
+preReqs = pp pp.pl m4w m4w.sh xfmPipe xfmPipe.pl
+perlScripts = getMD.pl getMD keyCleaner.pl keyCleaner template.pl template tarchive.pl tarchive sili.pl sili
 
-EXTRA_DIST = pp.pl xfmPipe.pl $(shm4files) $(shxfmfiles) $(plxfmfiles)
+bin_SCRIPTS = $(preReqs) $(perlScripts)
+CLEANFILES = pp m4w xfmPipe m4w.sh $(perlScripts)
+
+EXTRA_DIST = pp.pl xfmPipe.pl $(sources)
 
 
 

@@ -44,7 +44,7 @@ bindir=$(pkgdatadir)$(relativePath)
 bin_SCRIPTS = OracleHandle.pm RowSet.pm DBHandle.pm
 CLEANFILES = OracleHandle.pm RowSet.pm DBHandle.pm
 
-EXTRA_DIST = OracleHandle.pm.xfm RowSet.pm.xfm DBHandle.pm.xfm
+EXTRA_DIST = OracleHandle.pm RowSet.pm DBHandle.pm
 
 
 
