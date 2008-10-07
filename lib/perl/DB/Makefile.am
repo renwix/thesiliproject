@@ -42,7 +42,7 @@ test_rule ::; @echo "relativePath is $(relativePath) top_srcdir is $(top_srcdir)
 
 bindir=$(pkgdatadir)$(relativePath)
 bin_SCRIPTS = OracleHandle.pm RowSet.pm DBHandle.pm
-CLEANFILES = OracleHandle.pm RowSet.pm DBHandle.pm
+CLEANFILES = *~ *.bak
 
 EXTRA_DIST = OracleHandle.pm RowSet.pm DBHandle.pm
 
