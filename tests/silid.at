@@ -33,6 +33,21 @@ dnl
 dnl /gpl
 AT_SETUP(silid)
 
+AT_CHECK([echo 1 | sili --which],
+         [0],
+         [export ROOT="/home/renwick/work/sili/tests"; export SILI="AT_TEST_ROOT/silid_1.pl"; ],
+[ 0) sili: The sili codeline
+ 1) tests: The tests in the sili codeline
+ 2) compiler_test: silis_c_1.pl
+],
+[cat >$[]XFAILFILE <<'_EOT'
+
+==============================================================
+WARNING: SILID not defined. silid.at tests will all fail
+==============================================================
+_EOT
+],
+[rm -f $[]XFAILFILE])
 
 
 AT_CLEANUP

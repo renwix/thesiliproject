@@ -45,8 +45,7 @@ awk '{print NR " " $[]0}' $1 > $[]$.1
 awk '{print NR " " $[]0}' $1.re | join - $[]$.1 |
 while read NUM RE LINE
 do
-  echo "$LINE" | grep -- "$RE" >/dev/null || exit 1
-done
+  echo "$LINE" | grep -- "$RE" >/dev/null || exit done
 ])
 
 m4_define([AT_SKIP_TEST],[exit 77])
@@ -70,6 +69,8 @@ _EOT
 [rm -f $[]XFAILFILE])
 
 AT_CLEANUP
+
+m4_include(silid.at)
 
 
 

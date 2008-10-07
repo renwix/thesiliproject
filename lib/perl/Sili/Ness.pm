@@ -29,7 +29,7 @@
 # /gpl
 
 package Sili::Ness;
-use strict;
+# use strict;
 
 =pod
 
@@ -111,7 +111,6 @@ module. Polluting Perl namespaces is a bad thing!
 
 =cut
 sub gHash ($) {
-  no strict;
   return \%{*{ $_[0] }};
 }
 
@@ -126,7 +125,6 @@ module. Polluting Perl namespaces is a bad thing!
 
 =cut
 sub gArray ($) {
-  no strict;
   return \@{*{ $_[0] }};
 }
 
@@ -503,7 +501,6 @@ new class is nothing more than:
 
 =cut
 sub defineClass [$isa, $isSome] (@) {
-  no strict;
   my $class = (caller)[0];
   my $d = gHash $class . '::__data';
   my %a = @_;

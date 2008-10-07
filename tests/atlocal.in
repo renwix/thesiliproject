@@ -38,7 +38,7 @@
 PATH=@abs_builddir@:@abs_top_builddir@/src:@abs_top_srcdir@/build-aux:$top_srcdir:$srcdir:$PATH
 PERL5LIB=@abs_builddir@/lib/perl:@abs_top_builddir@/lib/perl:$PERL5LIB
 XFAILFILE=$abs_builddir/.badversion
-
+export SILID=@abs_top_builddir@/tests/silid_1.pl
 trap "test -r $XFAILFILE && cat $XFAILFILE; exit $?" 1 2 13 15
 
 
