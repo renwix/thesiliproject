@@ -68,24 +68,25 @@ defineClass
 
 package main;
 use Sili::Ness;
+use Env;
 
 # usually silis wouldn't = silid... but in this case they do.
 $silis = [
           new Def( name => 'sili',
                    description => 'The sili codeline',
-                   ROOT => '/home/renwick/work/sili',
-                   SILI => $ENV{SILID},
+                   ROOT => $HOME . '/wk/thesiliproject',
+                   SILI => $SILID,
                    target => new Target( name => 'build',
                                          command => 'makex' )),
           new Def( name => 'tests',
                    description => 'The tests in the sili codeline',
-                   ROOT => '/home/renwick/work/sili/tests',
-                   SILI => $ENV{SILID} ),
+                   ROOT => $HOME . '/wk/thesiliproject/tests',
+                   SILI => $SILID ),
 
           new Def( name => 'compiler_test',
                    description => 'silis_c_1.pl',
-                   ROOT => '/home/renwick/work/sili/tests',
-                   SILI => '/home/renwick/work/sili/tests/silis_c_1.pl' ),
+                   ROOT => $HOME . '/wk/thesiliproject/tests',
+                   SILI => $HOME . '/wk/thesiliproject/tests/silis_c_1.pl' ),
 
           ];
 

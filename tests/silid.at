@@ -35,7 +35,7 @@ AT_SETUP(silid)
 
 AT_CHECK([echo 1 | sili --which],
          [0],
-         [export ROOT="/home/renwick/work/sili/tests"; export SILI="AT_TEST_ROOT/silid_1.pl"; ],
+         [export ROOT="AT_TEST_ROOT"; export SILI="AT_TEST_ROOT/silid_1.pl"; ],
 [ 0) sili: The sili codeline
  1) tests: The tests in the sili codeline
  2) compiler_test: silis_c_1.pl
@@ -44,6 +44,102 @@ AT_CHECK([echo 1 | sili --which],
 
 ==============================================================
 WARNING: SILID not defined. silid.at tests will all fail
+==============================================================
+_EOT
+],
+[rm -f $[]XFAILFILE])
+
+
+AT_CHECK([(eval $(echo 2 | sili --which) && sili -c)],
+         [0],
+         [$VAR1 = bless( {
+                 'permissive' => 1,
+                 'name' => 'phase1',
+                 'children' => [[]],
+                 'doc' => 'hello world',
+                 'fn' => sub { "DUMMY" }
+               }, 'Sili::C' );
+$VAR1 = [[
+          'hi there'
+        ]];
+This is a test in main::tester
+This is a test in main::tester
+$VAR1 = bless( {
+                 'permissive' => 1,
+                 'name' => 'nestedTest1',
+                 'children' => [[
+                                 bless( {
+                                          'permissive' => 1,
+                                          'name' => 'nestedTest2',
+                                          'children' => [],
+                                          'doc' => 'hello world',
+                                          'fn' => sub { "DUMMY" }
+                                        }, 'Sili::C' )
+                               ]],
+                 'doc' => 'hello world',
+                 'fn' => sub { "DUMMY" }
+               }, 'Sili::C' );
+$VAR1 = [[
+          'hi there',
+          'hi there from nested test1'
+        ]];
+$VAR1 = bless( {
+                 'permissive' => 1,
+                 'name' => 'nestedTest2',
+                 'children' => [[]],
+                 'doc' => 'hello world',
+                 'fn' => sub { "DUMMY" }
+               }, 'Sili::C' );
+$VAR1 = [[
+          'hi there',
+          'hi there from nested test1',
+          'hi there from nested test2'
+        ]];
+$VAR1 = bless( {
+                 'permissive' => 1,
+                 'name' => 'nestedTest1',
+                 'children' => [[
+                                 bless( {
+                                          'permissive' => 1,
+                                          'name' => 'nestedTest2',
+                                          'children' => [],
+                                          'doc' => 'hello world',
+                                          'fn' => sub { "DUMMY" }
+                                        }, 'Sili::C' )
+                               ]],
+                 'doc' => 'hello world',
+                 '_failed_cnt' => '1',
+                 'fn' => sub { "DUMMY" }
+               }, 'Sili::C' );
+$VAR1 = [[
+          'hi there',
+          'hi there from nested test1',
+          'hi there from nested test2',
+          'hi there from nested test1'
+        ]];
+$VAR1 = bless( {
+                 'permissive' => 1,
+                 'name' => 'nestedTest2',
+                 'children' => [[]],
+                 'doc' => 'hello world',
+                 'fn' => sub { "DUMMY" }
+               }, 'Sili::C' );
+$VAR1 = [[
+          'hi there',
+          'hi there from nested test1',
+          'hi there from nested test2',
+          'hi there from nested test1',
+          'hi there from nested test2'
+        ]];
+],
+[ 0) sili: The sili codeline
+ 1) tests: The tests in the sili codeline
+ 2) compiler_test: silis_c_1.pl
+],
+[cat >$[]XFAILFILE <<'_EOT'
+
+==============================================================
+WARNING: sili -c (compilation) failed
 ==============================================================
 _EOT
 ],
