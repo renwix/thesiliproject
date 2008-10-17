@@ -188,6 +188,7 @@ sub new {
   }
   # set defaults & check types & required
   while (my ($k,$v) = each %$d) {
+    # defaults
     if ( $v->{default} && not exists $self->{$k} ) {
       if (ref $v->{default}) {
         $self->{$k} = dclone($v->{default});
@@ -195,10 +196,12 @@ sub new {
         $self->{$k} = $v->{default};
       }
     }
+    # validation
     if ( defined $v->{isa} && exists $self->{$k} ) {
       CONFESS "$k should be of type '" . $v->{isa} . "', not '" . ref( $self->{$k} ) . "'"
           unless ref( $self->{$k} ) eq $v->{isa};
     }
+    # required parameters
     if ( defined $v->{required} && ! exists $self->{$k} ) {
       CONFESS "$k is required to create a type of '" . ref( $self ) . "'";
     }
@@ -260,8 +263,8 @@ sub AUTOLOAD {
   # is this a valid field?
   confess "$attribute isn't defined for class '$class'!"
     if ! keyInISAObjs($attribute, $class);
-  # And a poor-man's accessor memoize
-  *{ $AUTOLOAD } = my $c = sub {
+
+  *{ $AUTOLOAD } = my $c = sub {   # And a poor-man's accessor memoize
     my ($_s, $_arg) = @_;
     $_s->{ $attribute } = $_arg if defined $_arg;
     return $_s->{ $attribute }
@@ -349,7 +352,9 @@ sub USAGE (@) {
     exit(1);
   } else {
     pod2usage({ -exitval => 1,
-                -verbose => ($main::debug ? $main::debug : ($main::help ? 2 : 1)),
+                -verbose => ($main::debug ? 
+                             $main::debug : 
+                             ($main::help ? 2 : 1)),
                 -output  => \*STDERR});
   }
 }
