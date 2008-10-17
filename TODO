@@ -1,2 +1,13 @@
-GPL
-create 'sili' binary - Bundle ont mapexec and mdx under the sili unbrella
+
+* 2008/10 : defineClass doc parser
+
+  Now that the docs for a class are defined in an internal DSL in a
+  src .pm file, we need a way to extract that information and make it
+  available as pod. The docs are already in metadata in the class (or
+  is that another enhancement?), so it should be possible to generate
+  an output file that contains both the inline pod doc and the
+  generated class structure pod info.
+
+* 2008/10 : more tests
+
+  This one will never end, I'm sure.
