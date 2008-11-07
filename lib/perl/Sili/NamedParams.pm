@@ -235,6 +235,7 @@ FILTER {
       next;
     }
 
+    # the next part is all expansion
     $name ||= '__ANON__';
     if (! $matched_unnamed_param ) {
       $ret .= "my \%_args = \@_; confess 'syntax error (named arguments required, but not provided: (' . \"\@_\" . ')) in call to $name' if scalar \@_ \% 2 != 0; " . nl;
@@ -243,8 +244,7 @@ FILTER {
     debugPrint( 2, "# $name DESCRIPTION ($description_lines) [$description]" );
     debugPrint( 3, "# $name ARGV ARRAY ", Dumper( \@argv ) );
 
-    # build the variables defined in the description.
-    # Allow directives to be specified on multiple lines, I.e. dupes
+    # expand parameters
     my %cache = ();
     for my $arg (@argv) {
       my $varName =  $arg->[SIGIL] . $arg->[NAME];

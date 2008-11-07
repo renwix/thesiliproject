@@ -33,12 +33,24 @@ dnl
 dnl /gpl
 AT_SETUP(siliness)
 
-AT_CHECK_SCRIPT([sili.checkdocs],
+AT_CHECK_SCRIPT([sili.nameddocs],
 [#!/usr/bin/perl
 package X;
 use Sili::Ness;
 defineClass
-  docs => "this is a worthless class";
+  docs => "'doc' named testclass documentation";
+1;
+package main;
+print "complete";
+],[0],[complete],[])
+
+
+AT_CHECK_SCRIPT([sili.unnameddocs],
+[#!/usr/bin/perl
+package X;
+use Sili::Ness;
+defineClass
+  "unnamed documentation";
 1;
 package main;
 print "complete";
