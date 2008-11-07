@@ -38,7 +38,32 @@
 # We need a recent Autotest.
 m4_version_prereq([2.52g])
 
-m4_define([AT_CHECK_SCRIPT],[AT_DATA(/tmp/$$.$1, [$2])
+# from autotest/general.m4
+# AT_CHECK(COMMANDS, [STATUS = 0], STDOUT, STDERR,
+#          [RUN-IF-FAIL], [RUN-IF-PASS])
+
+# AT_DATA(FILE, CONTENTS)
+# -----------------------
+# m4_define([AT_DATA],
+# [cat >$1 <<'_ATEOF'
+# $2[]_ATEOF
+# ])
+
+# AT_CAPTURE_FILE(FILE)
+# ---------------------
+# If the current test group does not behave as expected, save the contents of
+# FILE in the test suite log.
+
+# AT_XFAIL_IF(SHELL-EXPRESSION)
+# -----------------------------
+# Set up the test to be expected to fail if SHELL-EXPRESSION evaluates to
+# true (exitcode = 0).
+
+
+# AT_CHECK_SCRIPT(filename, [BODY], [STATUS], 
+#                 STDOUT, STDERR)
+#
+m4_define([AT_CHECK_SCRIPT],[AT_DATA([/tmp/$$.$1], [$2])
 chmod +x /tmp/$$.$1
 AT_CHECK([/tmp/$$.$1], [$3], [$4], [$5],
 [cat >$[]XFAILFILE <<'_EOT'
@@ -47,7 +72,7 @@ WARNING: unable to exec $1. See errors.
 ==============================================================
 _EOT
 ],
-[rm -f $$.$1])
+[rm -f /tmp/$$.$1])
 ])
 
 m4_define([RE_CHECK],[
@@ -60,6 +85,7 @@ do
 ])
 
 m4_define([AT_SKIP_TEST],[exit 77])
+
 
 AT_INIT
 dnl AT_TESTED(theSiliProject)
@@ -81,7 +107,7 @@ _EOT
 AT_CLEANUP
 
 m4_include(siliness.at)
-
+m4_dnl # m4 _include(silid.at)
 
 
 

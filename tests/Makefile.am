@@ -53,13 +53,14 @@ $(srcdir)/package.m4: $(top_srcdir)/configure.ac
 ## Test suite.  ##
 ## ------------ ##
 
-TESTSUITE_AT = \
- T-empty.at
+TESTSUITE_AT = 	T-empty.at \
+		siliness.at \
+		silid.at
 
 TESTSUITE = $(srcdir)/testsuite
 
 AUTOTEST = $(AUTOM4TE) --language=autotest
-$(TESTSUITE): package.m4 $(TESTSUITE_AT)
+$(TESTSUITE): package.m4 $(TESTSUITE_AT) $(TESTSUITE).at
 	$(AUTOTEST) -I $(srcdir) testsuite.at -o $@.tmp
 	mv $@.tmp $@
 
