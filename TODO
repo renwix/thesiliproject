@@ -1,4 +1,13 @@
 
+* 2008/11 : DB create/management tools
+
+  Since the information is now in metadata, it should be simple to
+  create a sili compiler that will convert db schema declarations into
+  sql execution scripts. It might even be possible to derive sql
+  scripts based on model comparisons across versions.
+
+  Need Pg support out the gates, and ORA might be nice too.
+
 * 2008/10 : defineClass doc parser
 
   Now that the docs for a class are defined in an internal DSL in a
@@ -11,3 +20,4 @@
 * 2008/10 : more tests
 
   This one will never end, I'm sure.
+
