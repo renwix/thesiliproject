@@ -1,0 +1,48 @@
+dnl -*-m4-*-
+dnl The general format for this file is to m4_include all the tests in
+dnl the current directory (as necessary). Each of those files should have
+dnl a AT _ SETUP and an AT _ CLEANUP block in it
+dnl gpl
+dnl 
+dnl  Author: Renwix (renwix@gmail.com)
+dnl  Maintainer: Renwix
+dnl  Copyright (C) 2008 Renwix, all rights reserved.
+dnl  Created: Tue Sep 23 23:52:17 MDT 2008
+dnl 
+dnl 
+dnl=======================================================================
+dnl 
+dnl This file is part of theSiliProject, a humorous software organization,
+dnl design and development toolkit.
+dnl 
+dnl theSiliProject is free software: you can redistribute it and/or modify
+dnl it under the terms of the GNU General Public License as published by
+dnl the Free Software Foundation, either version 3 of the License, or
+dnl (at your option) any later version.
+dnl 
+dnl theSiliProject is distributed in the hope that it will be useful,
+dnl but WITHOUT ANY WARRANTY; without even the implied warranty of
+dnl MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+dnl GNU General Public License for more details.
+dnl 
+dnl You should have received a copy of the GNU General Public License
+dnl along with theSiliProject. If not, see <http://www.gnu.org/licenses/>.
+dnl 
+dnl=======================================================================
+dnl 
+dnl /gpl
+AT_SETUP(siliness)
+
+AT_CHECK_SCRIPT([sili.checkdocs],
+[#!/usr/bin/perl
+package X;
+use Sili::Ness;
+defineClass
+  docs => "this is a worthless class";
+1;
+package main;
+print "complete";
+],[0],[complete],[])
+
+
+AT_CLEANUP

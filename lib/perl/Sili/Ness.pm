@@ -135,14 +135,14 @@ sub gArray ($) {
 
 This is used to recursively inspect an object hierarchy to discover if
 the key in question is defined as an available field in the current
-class, or any of it's parent classes. The __data hash in the class
+class, or any of it's parent classes. The __DATA hash in the class
 namespace defines the list of available fields for a class.
 
 =cut
 sub keyInISAObjs {
   my ($key, @isa) = @_;
   for my $i (@isa) {
-    my $data = gHash $i . '::__data';
+    my $data = gHash $i . '::__DATA';
     return 1 if exists $data->{$key};
     my $isa = gArray $i . '::ISA';
     return 1 if keyInISAObjs( $key, @$isa );
@@ -165,7 +165,7 @@ key. It uses the accessor to set the data passed in for the named
 value.
 
 Next it checks a list of defaults. The defaults are part of a classes
-__data hashref. If there are any default values defined in this class,
+__DATA hashref. If there are any default values defined in this class,
 or parent classes, that haven't been defined in the constructor call,
 then they are initialized here.
 
@@ -177,7 +177,7 @@ function in some way.
 sub new {
   my $class = shift;
   my $self  =  bless {}, $class;
-  my $d = gHash $class . '::__data';
+  my $d = gHash $class . '::__DATA';
   my %a = @_;
   while (my ($k, $v) = each %a) {
     # is this a valid field?
@@ -234,7 +234,7 @@ sub clone {
 This module implements AUTOLOAD. It is also a base class for the data
 descriptions in your own project. This means that it is possible to
 inadvertantly call a property that doesn't exist. There are some
-attempts made to check for this case by inspecting the __data
+attempts made to check for this case by inspecting the __DATA
 properties of the class hierarchy.
 
 Also, this AUTOLOAD works as a poor man's memoize, calling a property
@@ -505,15 +505,17 @@ new class is nothing more than:
                  param( name => 'y', doc => 'This is a variable') );
 
 =cut
-sub defineClass [$isa, $isSome] (@) {
+sub defineClass [$docs, $isa, $isSome] (@) {
   my $class = (caller)[0];
-  my $d = gHash $class . '::__data';
+  my $d = gHash $class . '::__DATA';
   my %a = @_;
+  *{ $class . '::__DESCRIPTION' } = $docs;
   $isa ||= $isSome;
   # handle isa specially
   my $their_isa = gArray $class . '::ISA';
   unshift @$their_isa, (ref $isa eq 'ARRAY' ? @$isa : $isa);
   delete $a{isa}; delete $_args{isa}; # generated
+  delete $a{docs}; delete $_args{docs}; # generated
   while (my ($name, $h) = each %a) {
     confess "$class::defineClass - Specify docs for $name!" unless $h->{doc};
     $d->{$name} = $h;
@@ -532,6 +534,7 @@ this library.
 
 =cut
 defineClass
+    docs => "Sili::Ness is the base of both siliScripts and siliClasses",
     param( name => 'trace',
            doc => 'set trace to be a default property',
            default => -1 ),

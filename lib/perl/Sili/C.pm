@@ -114,7 +114,7 @@ defineClass  # Sili::C
     ;
 
 sub import [$permissive] {
-  my $d = \%{*{'Sili::C::__data'}};
+  my $d = \%{*{'Sili::C::__DATA'}};
   $d->{permissive}->{default} = $permissive;
 }
 

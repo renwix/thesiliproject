@@ -38,6 +38,17 @@
 # We need a recent Autotest.
 m4_version_prereq([2.52g])
 
+m4_define([AT_CHECK_SCRIPT],[AT_DATA(/tmp/$$.$1, [$2])
+chmod +x /tmp/$$.$1
+AT_CHECK([/tmp/$$.$1], [$3], [$4], [$5],
+[cat >$[]XFAILFILE <<'_EOT'
+==============================================================
+WARNING: unable to exec $1. See errors.
+==============================================================
+_EOT
+],
+[rm -f $$.$1])
+])
 
 m4_define([RE_CHECK],[
 AT_DATA([$1.re],[$2])
@@ -54,10 +65,9 @@ AT_INIT
 dnl AT_TESTED(theSiliProject)
 AT_SETUP([sili version])
 
-AT_CHECK([sili --version | sed 1q],
+AT_CHECK([sili --version],
          [0],
-         [AT_PACKAGE_VERSION
-],
+         [AT_PACKAGE_VERSION],
 [],
 [cat >$[]XFAILFILE <<'_EOT'
 
@@ -70,7 +80,8 @@ _EOT
 
 AT_CLEANUP
 
-m4_include(silid.at)
+m4_include(siliness.at)
+
 
 
 
