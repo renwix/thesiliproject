@@ -505,10 +505,17 @@ new class is nothing more than:
                  param( name => 'y', doc => 'This is a variable') );
 
 =cut
-sub defineClass [$docs, $isa, $isSome] (@) {
+sub defineClass [$docs:unnamed, $isa, $isSome] (@) {
   my $class = (caller)[0];
   my $d = gHash $class . '::__DATA';
-  my %a = @_;
+  my (%a, $docs) = ();
+  if ( scalar @_ % 2 == 0 ) {
+    %a = ();
+    $docs = $a{docs};
+  } else {
+    $docs = shift;
+    %a = ();
+  }
   *{ $class . '::__DESCRIPTION' } = $docs;
   $isa ||= $isSome;
   # handle isa specially
@@ -534,7 +541,7 @@ this library.
 
 =cut
 defineClass
-    docs => "Sili::Ness is the base of both siliScripts and siliClasses",
+    "Sili::Ness is the base of both siliScripts and siliClasses",
     param( name => 'trace',
            doc => 'set trace to be a default property',
            default => -1 ),

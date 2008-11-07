@@ -198,12 +198,29 @@ FILTER {
     chomp($description);
 
     # convert the string into an @argv struct
+    # [ SIGIL, NAME, META_INFORMATION ]
+    # where META_INFORMATION is:
+    # [ NAME (:|=) ... ]
     my @d = split /,/, $description;
     my @argv = ();
+    my $matched_unnamed_param = 0;
     for my $d (@d) {
       debugPrint( 3,  "# ARGV: $d" );
       $d =~ /^(.{1})(\w+)(.*)/;
-      push @argv, [ $1, $2, ($3 ? $3 : undef) ];
+      my ($sigil, $varname, $rest) = ($1, $2, $3);
+      my @tokens = ();
+      if ($rest) {
+        # quick tokenize the META string
+        # uses whitespace as the delimiter
+        # which is guaranteed by the $description 'simplification' above
+        $rest =~ s/(:|=)/ $1 /g;
+        $rest =~ s/^\s*//; $rest =~ s/\s*$//;
+        @tokens = split /\s/, $rest;
+        # peek for params that are unnammed so that we
+        # can handle them differently during assertions
+        ($matched_unnamed_param) = grep { /^unnamed$/ } @tokens;
+      }
+      push @argv, [ $sigil, $varname, [ @tokens ] ];
     }
 
     # decide whether this fn has specified @argv
@@ -217,9 +234,11 @@ FILTER {
       $ret .= "sub $name { ";
       next;
     }
-  
-  $name ||= '__ANON__';
-  $ret .= "my \%_args = \@_; confess 'syntax error (named arguments required, but not provided: (' . \"\@_\" . ')) in call to $name' if scalar \@_ \% 2 != 0; " . nl;
+
+    $name ||= '__ANON__';
+    if (! $matched_unnamed_param ) {
+      $ret .= "my \%_args = \@_; confess 'syntax error (named arguments required, but not provided: (' . \"\@_\" . ')) in call to $name' if scalar \@_ \% 2 != 0; " . nl;
+    }
 
     debugPrint( 2, "# $name DESCRIPTION ($description_lines) [$description]" );
     debugPrint( 3, "# $name ARGV ARRAY ", Dumper( \@argv ) );
@@ -236,44 +255,27 @@ FILTER {
       }
       $cache{ $varName } = 1;
 
-      if ($arg->[META]) {
+      my @tokens = @{ $arg->[META] };
+      debugPrint( 2, "# $name TOKENS $varName -> [@tokens]" );
 
-        # quick tokenize the META string
-        # uses whitespace as the delimiter
-        # which is guaranteed by the $description 'simplification' above
-        $arg->[META] =~ s/(:|=)/ $1 /g;
-        $arg->[META] =~ s/^\s*//; $arg->[META] =~ s/\s*$//;
-        my @tokens = split /\s/, $arg->[META];
-
-        debugPrint( 2, "# $name TOKENS $varName -> [@tokens]" );
-
-        while (my $tok = shift @tokens) {
-          next unless $tok;
-
-          if ( $tok eq '=' ) {
-            $ret .= "$varName = ( $varName ? $varName : " . shift( @tokens ) . ' ); ' . nl;
-
-          } elsif ( $tok eq ':' ) {
-            my $tag = shift @tokens;
-
-            if ( $tag =~ /^req.*/i ) {
-              $ret .= " confess \"param:$aName is required in call to $name\" unless defined $varName; " . nl;
-
-            } elsif ( $tag =~ /^isa(.+)/i ) {
-              my $match = $1; $match =~ s!/!::!g;
-              $ret .= " confess 'param:$aName in call to $name\(\) is required to be a \"$match\"' if defined $varName && ! UNIVERSAL::isa(" .$varName . ", \"$match\"); " . nl;
-
-            } elsif ( $tag =~ /^(HASH|CODE|ARRAY|SCALAR|GLOB|REF)/i ) {
-              $ret .= " confess 'param:$aName in call to $name\(\) is required to be of ref type: \"$1\"' if defined $varName && ref(" .$varName . ") ne '$1'; " . nl;
-
-            } else {
-              $ret .= " confess 'param:$aName in call to $name\(\) failed $tag\(\) validation.' if defined $varName && not $tag(" .$varName . "); " . nl;
-
-            }
-
+      while (my $tok = shift @tokens) {
+        next unless $tok;
+        if ( $tok eq '=' ) {
+          $ret .= "$varName = ( $varName ? $varName : " . shift( @tokens ) . ' ); ' . nl;
+        } elsif ( $tok eq ':' ) {
+          my $tag = shift @tokens;
+          if ( $tag =~ /^req.*/i ) {
+            $ret .= " confess \"param:$aName is required in call to $name\" unless defined $varName; " . nl;
+          } elsif ( $tag =~ /^isa(.+)/i ) {
+            my $match = $1; $match =~ s!/!::!g;
+            $ret .= " confess 'param:$aName in call to $name\(\) is required to be a \"$match\"' if defined $varName && ! UNIVERSAL::isa(" .$varName . ", \"$match\"); " . nl;
+          } elsif ( $tag =~ /^(HASH|CODE|ARRAY|SCALAR|GLOB|REF)/i ) {
+            $ret .= " confess 'param:$aName in call to $name\(\) is required to be of ref type: \"$1\"' if defined $varName && ref(" .$varName . ") ne '$1'; " . nl;
           } else {
-            $ret .= "; " . nl;
+            $ret .= " confess 'param:$aName in call to $name\(\) failed $tag\(\) validation.' if defined $varName && not $tag(" .$varName . "); " . nl;
           }
+        } else {
+          $ret .= "; " . nl;
         }
       }
     }
