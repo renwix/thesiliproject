@@ -1,3 +1,8 @@
+* 2008/12 : defineScript 
+
+  wrap getopts, expand the vars into ::main and assert on existence
+  as necessary. Shouldn't require any preprocessor or anything like
+  that.
 
 * 2008/11 : DB create/management tools
 
