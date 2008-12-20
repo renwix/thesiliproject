@@ -1,4 +1,4 @@
-<: #-*- perl -*-
+#!/usr/bin/perl
 
 # gpl
 # 
@@ -30,30 +30,39 @@
 # 
 # /gpl
 
-# $xfmpipe = [{ command => 'pp.pl', chmod => '+x' }]
-use Helpers::PerlScript;
+=pod
 
-my $ps = Helpers::PerlScript->new( name => 'getMD.pl' , 
-                                   description => q!
+=head1 NAME
+
+getMD.pl - check ENV for exising variable definitions
+
+=head1 SYNOPSIS
+
+ > getMD.pl VAR1 VAR2
+
+=head1 ARGUMENTS
+
+=over 4
+
+=item --format
+
+By default this script produces shell output, but if this is set, then
+another language can be generated. Allowed values are currently 'sh',
+'perl'.
+
+=back
+
+=head1 DESCRIPTION
 
 Given a list, of values, and an environment to check for those values, getMD
 will return a string that can be evaled in the shell, or required into perl.
 
+=cut
 
-                                   !,
-                                   include => [],
-                                   getopts => [
-                                               { tag => 'format:s',
-                                                 variable => '$format',
-                                                 default => 'sh',
-                                                 description => 'By default this script produces shell output, but if this is set it will produce perl that can be evaled',},
-                                               
-                                               ],
-                                   );
-print $ps->dump(); print $ps->pod();
-:>
- 
-#print_usage() unless .... some condition;
+use Sili::Ness;
+getopts
+    'format=s' => \my $format,
+    ;
 
 my (@required, @output, %guts) = ();
 my ($def_string, $cpp_string, $perl_string);
@@ -99,4 +108,4 @@ unless ($format =~ /perl/i) {
   print $perl_string;
 }
 
-cleanup 0; # "
+exit 0;

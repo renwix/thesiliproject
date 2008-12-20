@@ -1,4 +1,4 @@
-<: #-*- perl -*-
+#!/usr/bin/perl
 
 # gpl
 # 
@@ -30,31 +30,45 @@
 # 
 # /gpl
 
-# $xfmpipe = [{ command => 'pp.pl', chmod => '+x' }]
-use Helpers::PerlScript;
+=pod
 
-my $ps = Helpers::PerlScript->new( name => 'keyCleaner.pl' , 
-                                   description => q[
-Given an input file and a mask, search that file for comment character - keyword pairs
-and assemble a list. Return the assembled list.
+=head1 NAME
 
-This used to be a grep passed into keyCleaner - but 9 times out of 10, that level
-of separation is not needed.
+keyCleaner.pl - grep prefixed tags from an input file
 
-                                                    ],
-                                   include => [],
-                                   getopts => [
-                                               { tag => 'commentChar:s',
-                                                 variable => '$commentChar',
-                                                 default => '#',
-                                                 description => 'The comment character.'},
-                                               { tag => 'keywords:s',
-                                                 variable => '@keywords',
-                                                 description => 'A list of keywords that should exist in the file.'},
-                                               ],
-                                   );
-print $ps->dump(); print $ps->pod();
-:>
+=head1 SYNOPSIS
+
+ > cat file | keyCleaner.pl MASK
+
+=head1 DESCRIPTION
+
+Given an input file and a mask, search that file for comment character
++ keyword pairs and assemble a list. Return the assembled list.
+
+=head1 ARGUMENTS
+
+=over 4
+
+=item --commentChar
+
+'The comment character.
+
+=item --keywords
+
+A list of keywords that should exist in the file.
+
+=back
+
+=cut
+
+
+use Sili::Ness;
+
+my $commentChar = '#'; my $keywords;
+getopts 
+    'commentChar=s' => \$commentChar,
+    'keywords=s'    => \$keywords,
+    ;
     
 my @buffer = ();
 
@@ -69,4 +83,5 @@ while (<>) {
 }
 print join ' ', @buffer;
 
-cleanup 0; # "
+exit 0;
+

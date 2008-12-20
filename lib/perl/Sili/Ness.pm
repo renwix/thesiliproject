@@ -382,6 +382,7 @@ sub getopts (@) {
   GetOptions( 'debug+'   => \$main::debug,
               'help'     => \$main::help,
               'NOEXEC'   => \$main::noexec, # just tell us what you are going to do
+              'verbose+' => \$main::verbose,
               @_ );
   $main::help && USAGE;
 }

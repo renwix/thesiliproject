@@ -34,84 +34,75 @@
 
 =head1 NAME
 
-pp.pl    
+pp.pl - yet another perl templating language
 
 =head1 SYNOPSIS
 
-A library based, fast perl pre-processor
+ > cat template | pp.pl > expanded_code
 
 =head1 ARGUMENTS
 
 =over 4
 
-=item '-s'
+=item --start-tag
 
-The start tag.
+The start tag. defaults to '<:'.
     
-=item '-e'
+=item --end-tag
 
-The end tag.
+The end tag. defaults to ':>'.
 
-=item '-k'
+=item --keep
 
-Keep: pring the generated intermediate script on STDOUT.
+Keep: print the generated intermediate script on STDOUT.
 
-=item '-d'
+=item --debug
 
 The $debug command line flag and can be used with the &debugPrint subroutine.
 
-=item '-h'
+=item --help
 
 The help command line flag will print the help message.
 
 =back
 
+=head1 DESCRIPTION
+
+Uses a templating language similar to JSP or ASP to expand and
+transform a file with embedded perl.
+
 =cut
 
-use Getopt::Std qw(getopts);
 use Expander;
 use File::Basename;
+use Sili::Ness;
+use Env;
 our ($debug, $opt_s, $opt_e, $opt_i, $opt_x, $opt_d, $opt_n);
 
 # command line opts
-my $__include_char = "-"; $__inclue_char = $ENV{__include_char} if $ENV{__include_char};
-my $__expand_char = "="; $__expand_char = $ENV{__expand_char} if $ENV{__expand_char};
-my $__start_tag = "<:"; $__start_tag = $ENV{__start_tag} if $ENV{__start_tag};
-my $__end_tag = ":>"; $__end_tag = $ENV{__end_tag} if $ENV{__end_tag};
+my $__include_char = "-"; 
+$__inclue_char = $ENV{__include_char} if $ENV{__include_char};
+my $__expand_char = "="; 
+$__expand_char = $ENV{__expand_char} if $ENV{__expand_char};
+my $__start_tag = "<:"; 
+$__start_tag = $ENV{__start_tag} if $ENV{__start_tag};
+my $__end_tag = ":>"; 
+$__end_tag = $ENV{__end_tag} if $ENV{__end_tag};
 my $keep; $keep = $ENV{keep} if $ENV{keep};
 $debug = "0"; $debug = $ENV{debug} if $ENV{debug};
 my $help = "0"; $help = $ENV{help} if $ENV{help};
 
-getopts('d:ns:e:i:x:');
-$__start_tag = $opt_s if $opt_s;
-$__end_tag = $opt_e if $opt_e;
-$__include_char = $opt_i if $opt_i;
-$__expand_char = $opt_x if $opt_x;
-$debug = $opt_d;
-$no_eval = $opt_n;
-
-# internal fns
-sub debugPrint ($@) { 
-  my $l = shift;
-  return if ($main::debug < $l);
-  my $c = '[' . (caller(1))[3] . ']';
-  my $d = localtime;
-  print STDERR "$c $d: " . basename($0) . ":($$): @_.\n" ;
-}
-
-sub printUsage {
-  if (scalar @_ > 0) {
-    print STDERR "@_\n";
-    exit(1);
-  } else {
-    pod2usage({ -exitval => 1, 
-                -verbose => ($debug ? $debug : 1),
-                -output  => \*STDERR});
-  }
-}
+getopts
+    'start-tag=s' => \$__start_tag,
+    'end-tag=s'   => \$__end_tag,
+    'include-char=s' => \$__include_char,
+    'x|expand-char=s' => \$__expand_char,
+    'debug' => \$debug,
+    'no-eval|keep' => \$keep,
+    ;
 
 # processing
-printUsage() if $help;
+USAGE if $help;
 my $expander = new Expander( __start_tag => $__start_tag,
                              __end_tag => $__end_tag,
                              __include_char => $__include_char,
