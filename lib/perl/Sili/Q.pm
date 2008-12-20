@@ -104,7 +104,7 @@ sub _query {
   my $accumulator = shift;
   my $fn = shift;
   my $q = [ @_ ]; # manual tail-call impl
-  for my $l (@$q) {
+  for my $l (@$q) { 
     debugPrint 6, "Looking at $l in ['", join "','", @$q, "']";
     if ( $fn->( $l ) ) {
       push @$accumulator, $l;
@@ -134,7 +134,6 @@ sub query (&@) {
   return @$acc;
 }
 
-
 =pod
 
 =head2 query_by_type( named arguments )
@@ -143,8 +142,6 @@ Given a declared type, find all Siliness of that type:
 
   my @siliness_of_type = query_by_type( type => 'test',
                                     list => [ @siliness ] );
-
-
 
 =cut
 
