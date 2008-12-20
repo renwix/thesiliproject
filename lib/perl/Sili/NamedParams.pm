@@ -58,7 +58,7 @@ Is actually nice to type-check perl vars
 
 =item *
 
-Makes it easier to do modular perl progamming and larger systems
+Makes it easier to do modular perl progamming in larger systems
 
 =back
 
@@ -145,11 +145,13 @@ sub META  () { 2 };
     return unless $level && $file;
 
     $__debugging = $level;
-    $__debug_fh = new IO::File ">$file" || confess "unable to open debug output: $file: $!";
+    $__debug_fh = new IO::File ">$file" || 
+        confess "unable to open debug output: $file: $!";
   }
   sub debugPrint {
     my $level = shift;
-    print $__debug_fh "@_\n" if defined $__debug_fh && $__debugging >= $level;
+    print $__debug_fh "@_\n" 
+        if defined $__debug_fh && $__debugging >= $level;
   }
   sub nl () { return ($__debugging > 1 ? "\n" : ' ') }
 }
@@ -260,9 +262,9 @@ FILTER {
 
       while (my $tok = shift @tokens) {
         next unless $tok;
-        if ( $tok eq '=' ) {
+        if ( $tok eq '=' ) { # defaults
           $ret .= "$varName = ( $varName ? $varName : " . shift( @tokens ) . ' ); ' . nl;
-        } elsif ( $tok eq ':' ) {
+        } elsif ( $tok eq ':' ) { # meta required/isa/REF/CODE
           my $tag = shift @tokens;
           if ( $tag =~ /^req.*/i ) {
             $ret .= " confess \"param:$aName is required in call to $name\" unless defined $varName; " . nl;
