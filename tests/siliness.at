@@ -68,18 +68,6 @@ print "complete";
 ])
 
 
-AT_CHECK_SCRIPT([sili.defineScript.tag.fail],
-[#!/usr/bin/perl
-use Sili::Ness;
-defineScript
-  "test params",
-  param( name => 'XXX',
-         doc => 'some test'  )
-  ;
-print "complete";
-],[2],[],[Specify a 'tag' for XXX
-])
-
 AT_CHECK_SCRIPT([sili.defineScript.variable.fail],
 [#!/usr/bin/perl
 use Sili::Ness;
@@ -113,5 +101,42 @@ defineScript
   ;
 print $X;print $Y;
 ],[0],[testdefault vaule],[])
+
+
+AT_CHECK([defineScript_test.pl -X 123 -Y],
+         [0],
+         [X = > 123
+Y = > 1
+],[],[cat >$[]XFAILFILE <<'_EOT'
+==============================================================
+WARNING: defineScript error
+==============================================================
+_EOT
+],[rm -f $[]XFAILFILE])
+
+AT_CHECK([Y=11 defineScript_test.pl -X 123],
+         [0],
+         [X = > 123
+Y = > 11
+],[],[cat >$[]XFAILFILE <<'_EOT'
+==============================================================
+WARNING: defineScript error
+==============================================================
+_EOT
+],[rm -f $[]XFAILFILE])
+
+
+AT_CHECK([X=123 defineScript_test.pl -Y],
+         [0],
+         [X = > 123
+Y = > 1
+],[],[cat >$[]XFAILFILE <<'_EOT'
+==============================================================
+WARNING: defineScript error
+==============================================================
+_EOT
+],[rm -f $[]XFAILFILE])
+
+
 
 AT_CLEANUP

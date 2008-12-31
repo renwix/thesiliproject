@@ -554,14 +554,12 @@ sub defineScript [$docs:unnamed] (@) {
         $variable_name =~ s/^(\$|\@|\%)//;
         $h->{sigil} = $1;
         $h->{variable_name} = $variable_name;
+        $h->{tag} ||= $name;
 
         $d->{$name} = $h;
         # ASSERT
         if (! $h->{doc} || length $h->{doc} < 5) {
             FAIL "Specify (real) documentation for $name";
-        }
-        if (! $h->{tag}) {
-            FAIL "Specify a 'tag' for $name";
         }
         if (! $h->{variable}) {
             FAIL "Specify a 'variable' for $name";
