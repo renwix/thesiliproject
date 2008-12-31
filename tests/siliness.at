@@ -57,4 +57,61 @@ print "complete";
 ],[0],[complete],[])
 
 
+AT_CHECK_SCRIPT([sili.defineScript.doc.fail],
+[#!/usr/bin/perl
+use Sili::Ness;
+defineScript
+  "bad"
+  ;
+print "complete";
+],[2],[],[Specify (real) documentation for script
+])
+
+
+AT_CHECK_SCRIPT([sili.defineScript.tag.fail],
+[#!/usr/bin/perl
+use Sili::Ness;
+defineScript
+  "test params",
+  param( name => 'XXX',
+         doc => 'some test'  )
+  ;
+print "complete";
+],[2],[],[Specify a 'tag' for XXX
+])
+
+AT_CHECK_SCRIPT([sili.defineScript.variable.fail],
+[#!/usr/bin/perl
+use Sili::Ness;
+defineScript
+  "test params",
+  param( name => 'XXX',
+         doc => 'some test',
+         tag => 'XXX'  )
+  ;
+print "complete";
+],[2],[],[Specify a 'variable' for XXX
+])
+
+
+AT_CHECK_SCRIPT([sili.defineScript.env.var],
+[#!/usr/bin/perl
+use Sili::Ness;
+$ENV{'X'} = 'test';
+
+defineScript
+  "test params",
+  param( name => 'X',
+         doc => 'some test',
+         tag => 'X:s',
+         variable => '$X'  ),
+  param( name => 'Y',
+         doc => 'some test',
+         tag => 'Y:s',
+         default => 'default vaule',
+         variable => '$Y'  )
+  ;
+print $X;print $Y;
+],[0],[testdefault vaule],[])
+
 AT_CLEANUP

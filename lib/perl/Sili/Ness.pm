@@ -72,7 +72,7 @@ use Pod::Usage;
 use Exporter;
 our (@ISA, @EXPORT);
 @ISA = qw( Exporter );
-@EXPORT = qw( defineClass isObject debugPrint param members isa isSome CONFESS CROAK WARN USAGE getopts );
+@EXPORT = qw( defineClass isObject debugPrint param members isa isSome CONFESS CROAK WARN USAGE getopts defineScript );
 
 sub CONFESS (@) { confess BOLD, RED, @_, RESET }
 sub CROAK   (@) { croak BOLD, RED, @_, RESET }
@@ -378,7 +378,7 @@ It probably won't work very well with 'strict'.
 =cut
 sub getopts (@) {
   return if $ENV{ SILI_ENV_DISABLE };
-  Getopt::Long::Configure('pass_through');
+  Getopt::Long::Configure('pass_through', 'no_ignore_case');
   GetOptions( 'debug+'   => \$main::debug,
               'help'     => \$main::help,
               'NOEXEC'   => \$main::noexec, # just tell us what you are going to do
@@ -403,25 +403,33 @@ sub __doc_defined {
 
 =pod
 
-=head3 param_struct = param(name=>'name',doc=>'text',default=>'default')
+=head3 param_struct = param(name=>'name',doc=>'text',default=>'default',...)
 
-A helper utility, shortcut for defining class 'parameters'. The point
-of this function is to create a data structure that can be consumed by
-the defineClass() function below. See those docs for more information.
+A helper for defining script command line arguments or class
+properties. The point of this function is to create a data structure
+that can be consumed by the defineScript() or defineClass() functions
+below. See those docs for more information.
 
 This function is exported into your namespace by default.
 
+The Getopt::Long package is used for argument parsing. The default
+value is taken from the environment. The command line overrides env
+vars.
+
 =cut
 sub param [$name:required,
+           $doc:required:__doc_defined,
            $isa,
            $required,
-           $doc:__doc_defined,
-           $default]
-{
-  return ( $name => { doc => $doc,
-                      isa => $isa,
-                      required => $required,
-                      default => $default } );
+           $default,
+           $tag,
+           $variable] {
+    return ( $name => { doc => $doc,
+                        $tag && tag => $tag,
+                        $variable && variable => $variable,
+                        $isa && isa => $isa,
+                        $required && required => $required,
+                        $default && default => $default } );
 }
 
 
@@ -531,6 +539,66 @@ sub defineClass [$docs:unnamed, $isa, $isSome] (@) {
   return 1;   # means that package defs don't need to end true.
 }
 
+sub FAIL { print STDERR "@_\n"; exit 2 }
+sub defineScript [$docs:unnamed] (@) {
+    my ($class) = (caller)[0];
+    my $d = gHash $class . '::__DATA';
+    my (%a, $docs, %cmdArgs) = ();
+    $docs = (scalar @_ % 2 == 0 ? $a{docs} : shift);
+    length $docs > 5 || FAIL "Specify (real) documentation for script";
+    *{ $class . '::__DESCRIPTION' } = $docs;
+    %a = @_;
+    delete $a{docs}; delete $_args{docs};
+    while (my ($name, $h) = each %a) {
+        my ($variable_name) = $h->{variable};
+        $variable_name =~ s/^(\$|\@|\%)//;
+        $h->{sigil} = $1;
+        $h->{variable_name} = $variable_name;
+
+        $d->{$name} = $h;
+        # ASSERT
+        if (! $h->{doc} || length $h->{doc} < 5) {
+            FAIL "Specify (real) documentation for $name";
+        }
+        if (! $h->{tag}) {
+            FAIL "Specify a 'tag' for $name";
+        }
+        if (! $h->{variable}) {
+            FAIL "Specify a 'variable' for $name";
+        }
+        # SET
+        if (exists $ENV{$name}) {
+            ${*{ $class . '::' . $variable_name }} = $ENV{$name};
+        } elsif (exists $h->{default}) {
+            ${*{ $class . '::' . $variable_name }} = $h->{default};
+        }
+        if ($h->{sigil} eq '$') {
+            $cmdArgs{$h->{tag}} = \${*{$class . '::' . $variable_name}};
+        } elsif ($h->{sigil} eq '@') {
+            $cmdArgs{$h->{tag}} = \@{*{$class . '::' . $variable_name}};
+        } elsif ($h->{sigil} eq '%') {
+            $cmdArgs{$h->{tag}} = \@{*{$class . '::' . $variable_name}};
+        }
+    }
+    # CommandLine Args
+#    print STDERR Dumper(\%cmdArgs);
+    getopts %cmdArgs;
+
+    # And the final checks
+    while (my ($name, $h) = each %a) {
+        my $cmd = $h->{sigil} . 'v = ' . 
+            $h->{sigil} . $class . '::' . $h->{variable_name};
+        eval $cmd;
+        if ($@) {
+            FAIL "oops ", $@;
+        }
+        $h->{isa} && FAIL "$name should be a " . $h->{isa}
+            unless $v =~ /$h->{isa}/o;
+        if ($h->{required} && ! ($v || @v || %v)) {
+            FAIL "$name is required";            
+        }
+    }
+}
 
 =pod
 
