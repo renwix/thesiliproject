@@ -539,6 +539,34 @@ sub defineClass [$docs:unnamed, $isa, $isSome] (@) {
   return 1;   # means that package defs don't need to end true.
 }
 
+=pod
+
+=head3 defineScript( doc, ( param(), param() ) );
+
+Standardize perl scripts on a similar format for defining docs and
+variables to what happens with defineObject. Do something like:
+
+  defineScript
+    "Short description of the script",
+    param( name => 'arg1',
+           tag => 'arg1:s',
+           variable => '$arg1',
+           doc => 'Information abt this variable' ),
+    ...
+    ;
+
+And for that, you set it up so that the script will inherit those
+named variables from the environment first, then from the
+commandline. Also the variable named in the declaration will be
+created in the perlscript's space and available for use. 
+
+Getopt::Long is used for parsing arguments, so tag formats follow that
+package's declarations. The tag is optional and defaults to the value
+of 'name' passed directly to Getopt::Long, or - it creates a
+flag. Perldocs are generated from the individual 'doc' labels.
+
+=cut
+# special FAIL() fn for testing compatibility
 sub FAIL { print STDERR "@_\n"; exit 2 }
 sub defineScript [$docs:unnamed] (@) {
     my ($class) = (caller)[0];
