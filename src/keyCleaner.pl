@@ -51,7 +51,7 @@ Given an input file and a mask, search that file for comment character
 
 =item --commentChar
 
-'The comment character.
+The comment character.
 
 =item --keywords
 
@@ -65,9 +65,19 @@ A list of keywords that should exist in the file.
 use Sili::Ness;
 
 my $commentChar = '#'; my $keywords;
-getopts 
-    'commentChar=s' => \$commentChar,
-    'keywords=s'    => \$keywords,
+defineScript
+    "keyCleaner.pl - grep prefixed tags from an input file.
+
+Given an input file and a mask, search that file for comment character
++ keyword pairs and assemble a list. Return the assembled list.",
+    param( name => 'commentChar',
+           tag =>  'commentChar:s',
+           variable => '$commentChar',
+           doc => 'The comment character.' ),
+    param( name => 'keywords',
+           tag => 'keywords:s',
+           variable => '$keywords',
+           doc => 'A list of keywords that should exist in the file.' ),
     ;
     
 my @buffer = ();

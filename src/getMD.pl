@@ -60,8 +60,16 @@ will return a string that can be evaled in the shell, or required into perl.
 =cut
 
 use Sili::Ness;
-getopts
-    'format=s' => \my $format,
+defineScript
+    "getMD.pl - check ENV for exising variable definitions.
+It will prompt if the variable doesn't exist in the environment.",
+    param( name => 'format',
+           tag => 'format=s',
+           variable => '$format',
+           doc => '
+By default this script produces shell output, but if this is set, then
+another language can be generated. Allowed values are currently:sh,perl'
+    ),
     ;
 
 my (@required, @output, %guts) = ();
