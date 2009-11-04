@@ -169,6 +169,7 @@ use Sili::Ness;
 use Sili::Q;
 use Getopt::Long;
 use Data::Dumper;
+use Carp;
 $| = 0;
 
 
@@ -280,12 +281,12 @@ for my $pkg (@packages) {
   if (@targets) {
     for my $trg (@targets) {
       debugPrint 1, "Processing target: ", $trg->name;
-      docmd "cd " . $pkg->ROOT . " && " .
-          $trg->command . ' ' . $trg->name;
+      docmd("cd " . $pkg->ROOT . " && " .
+            $trg->command . ' ' . $trg->name);
     }
   } else {
     debugPrint 1, "Execing $cmd on " . $pkg->name;
-    print docmd "cd " . $pkg->ROOT . " && " . $cmd;
+    print docmd("cd " . $pkg->ROOT . " && " . $cmd);
   }
 }
 

@@ -31,7 +31,7 @@
 include $(top_srcdir)/autofiles/bootstrap.mk
 
 
-SUBDIRS =  lib src templates tests
+SUBDIRS =  lib src tests
 
 
 relativePath = $(shell tmp=`cd $(top_srcdir); pwd`; pwd | perl -ple "s,$$tmp,,")

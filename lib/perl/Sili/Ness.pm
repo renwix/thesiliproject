@@ -72,7 +72,7 @@ use Pod::Usage;
 use Exporter;
 our (@ISA, @EXPORT);
 @ISA = qw( Exporter );
-@EXPORT = qw( defineClass isObject debugPrint param members isa isSome CONFESS CROAK WARN USAGE getopts defineScript );
+@EXPORT = qw( defineClass isObject debugPrint param members isa isSome CONFESS CROAK WARN USAGE getopts defineScript docmd );
 
 sub CONFESS (@) { confess BOLD, RED, @_, RESET }
 sub CROAK   (@) { croak BOLD, RED, @_, RESET }
@@ -334,6 +334,33 @@ sub debugPrint ($@) {
   my $c = (caller(1))[3];
   my $d = localtime;
   print STDERR "[$d] $c: @msg\n";
+}
+
+sub docmd (@) {    
+  printmsg "@_" ;
+#    system(@_);
+    
+  my $pid = open (CHILD, "@_ |") || CONFESS "unable to open a pipe for command @_";
+  my @stdout = <CHILD>;
+  my $ret = close(CHILD);
+  my $rc;
+  if ($? == -1) {
+    $rc = -1; printmsg "failed to execute: $!";
+    exit $rc;
+  } elsif ($? & 127) {
+    $rc = $? & 127;
+    print STDERR "child process died with signal $rc, ", 
+      ($? & 128) ? 'with' : 'without', " coredump";
+    exit $rc;
+  } else {
+    $rc = $? >> 8;
+    if ($rc || ! $ret) {
+      print STDOUT @stdout;
+      printmsg "child process exited with value $rc - Exiting!";
+      exit $rc || $ret;
+    }
+  }
+  return @stdout;
 }
 
 =pod
