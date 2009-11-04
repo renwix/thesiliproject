@@ -266,8 +266,12 @@ sub AUTOLOAD {
 
   *{ $AUTOLOAD } = my $c = sub {   # And a poor-man's accessor memoize
     my ($_s, $_arg) = @_;
-    $_s->{ $attribute } = $_arg if defined $_arg;
-    return $_s->{ $attribute }
+    if (defined $_arg) {
+        $_s->{ $attribute } = $_arg ;
+        return $_s;
+    } else {
+        return $_s->{ $attribute }
+    }
   };
   return $c->($self, @argv);
 }
