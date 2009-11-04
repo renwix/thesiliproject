@@ -606,6 +606,9 @@ sub defineScript [$docs:unnamed] (@) {
             $cmdArgs{$h->{tag}} = \@{*{$class . '::' . $variable_name}};
         }
     }
+    # short circuit for doc printing
+    return if $a{_sili_generate_pod_docs};
+
     # CommandLine Args
 #    print STDERR Dumper(\%cmdArgs);
     getopts %cmdArgs;
