@@ -209,10 +209,9 @@ sub choose_silis {
 }
 
 sub show_silis { print STDERR Dumper( @_ ) }
-sub binpath { print "PKG_BIN" }
-sub libpath { print "PKG_LIB" }
-sub templateRepo { print "PKG_TEMPLATES" }
-sub version { print "VERSION" }
+sub binpath { print "$ENV{SILIHOME}/share/thesiliproject/bin" }
+sub libpath { print "$ENV{SILIHOME}/share/thesiliproject/lib" }
+sub version { print "grrr" }
 
 my @targets; my @packages;
 my $sili = $ENV{SILI};
