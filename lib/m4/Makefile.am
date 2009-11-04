@@ -30,7 +30,7 @@
 
 include $(top_srcdir)/autofiles/bootstrap.mk
 
-M4_FILELIST = list.m4 vbscript.m4 shell.m4 dep.m4 base.m4 scsh.m4 pod.m4 make.m4
+M4_FILELIST = dep.m4 base.m4 pod.m4
 
 SUBDIRS = 
 

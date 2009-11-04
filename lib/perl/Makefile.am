@@ -31,7 +31,7 @@
 include $(top_srcdir)/autofiles/bootstrap.mk
 
 
-SUBDIRS =  DB Template Helpers Sili
+SUBDIRS =  DB Sili
 
 
 relativePath = $(shell tmp=`cd $(top_srcdir); pwd`; pwd | perl -ple "s,$$tmp,,")
@@ -41,10 +41,9 @@ test_rule ::; @echo "relativePath is $(relativePath) top_srcdir is $(top_srcdir)
 
 
 bindir=$(pkgdatadir)$(relativePath)
-bin_SCRIPTS = Directive.pm Pddoc.pm Expander.pm Sili.pm
-CLEANFILES =  Pddoc.pm
+bin_SCRIPTS = Directive.pm Expander.pm Sili.pm
 
-EXTRA_DIST = Directive.pm Pddoc.pm.xfm Expander.pm Sili.pm
+EXTRA_DIST = Directive.pm Expander.pm Sili.pm
 
 
 

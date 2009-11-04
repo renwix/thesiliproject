@@ -31,7 +31,7 @@
 include $(top_srcdir)/autofiles/bootstrap.mk
 
 
-SUBDIRS =  make shell m4 perl
+SUBDIRS =  make m4 perl
 
 
 relativePath = $(shell tmp=`cd $(top_srcdir); pwd`; pwd | perl -ple "s,$$tmp,,")

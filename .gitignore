@@ -1,4 +1,3 @@
-lib/shell/*.sh
 Makefile
 Makefile.in
 aclocal.m4
@@ -7,21 +6,11 @@ autom4te.cache
 config.log
 config.status
 configure
-lib/perl/Helpers/PerlScript.pm
-lib/perl/Helpers/TestHelper.pm
-lib/perl/Pddoc.pm
-lib/perl/Template/SimpleTextArchive.pm
-lib/shell/shellSnippets.m4
-src/getMD
-src/keyCleaner
 src/m4w
 src/m4w.sh
 src/pp
 src/sili
 src/sili.pl
-src/tarchive
-src/template
-src/template.pl
 src/xfmPipe
 tests/atconfig
 tests/atlocal

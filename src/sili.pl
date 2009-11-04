@@ -1,4 +1,4 @@
-<: #-*-perl-*-
+#!/usr/bin/perl
 
 # gpl
 # 
@@ -29,10 +29,6 @@
 #=======================================================================
 # 
 # /gpl
-
-# $xfmpipe = [ { command => 'pp.pl' }, { command => 'm4w.sh', chmod => '+x' } ];
-use Helpers::shell;    # docmd and printmsg
-:>#!/usr/bin/perl
 
 =pod
 
@@ -175,8 +171,6 @@ use Getopt::Long;
 use Data::Dumper;
 $| = 0;
 
-<:= Helpers::shell::printmsg :>
-<:= Helpers::shell::docmd :>
 
 sub _get_objs [$tag:required, $list:required] {
   return unless $tag;
