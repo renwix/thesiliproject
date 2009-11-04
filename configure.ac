@@ -127,7 +127,7 @@ AM_MISSING_PROG([AUTOM4TE], [autom4te])
 AC_CONFIG_FILES(tests/Makefile tests/atlocal)
 
 
-AC_CONFIG_FILES(src/Makefile lib/perl/DB/Makefile lib/Makefile Makefile lib/make/Makefile lib/perl/Makefile lib/m4/Makefile templates/Makefile lib/perl/Sili/Makefile)
+AC_CONFIG_FILES(src/Makefile lib/perl/DB/Makefile lib/Makefile Makefile lib/make/Makefile lib/perl/Makefile lib/m4/Makefile lib/perl/Sili/Makefile)
 
 
 AC_OUTPUT

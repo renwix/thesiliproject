@@ -38,7 +38,7 @@ test_rule ::; @echo "relativePath is $(relativePath) top_srcdir is $(top_srcdir)
 
 sources = sili.pl m4w.sh.m4
 preReqs = pp pp.pl m4w m4w.sh xfmPipe xfmPipe.pl
-perlScripts = getMD.pl getMD keyCleaner.pl keyCleaner sili.pl sili
+perlScripts = sili.pl sili
 
 bin_SCRIPTS = $(preReqs) $(perlScripts)
 CLEANFILES = pp m4w xfmPipe m4w.sh $(perlScripts)

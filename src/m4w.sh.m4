@@ -1,5 +1,4 @@
-<: # -*-sh-*-
-
+#!/bash/bin
 # gpl
 # 
 #  Author: Renwix (renwix@gmail.com)
@@ -29,12 +28,6 @@
 #=======================================================================
 # 
 # /gpl
-
-use Helpers::shell;
-print Helpers::shell::shellScript(suppressChangeQuote => 1); 
-
-# this script has access to the build/compile time m4 make macros
-:>
 
 #
 # You can further influence the m4 command by specifying M4_FLAGS or M4_DEBUG
