@@ -337,15 +337,14 @@ sub debugPrint ($@) {
 }
 
 sub docmd (@) {    
-  printmsg "@_" ;
-#    system(@_);
-    
-  my $pid = open (CHILD, "@_ |") || CONFESS "unable to open a pipe for command @_";
+  debugPrint 1, "@_" ;
+  my $pid = open (CHILD, "@_ |") ||
+      CONFESS "unable to open a pipe for command @_";
   my @stdout = <CHILD>;
   my $ret = close(CHILD);
   my $rc;
   if ($? == -1) {
-    $rc = -1; printmsg "failed to execute: $!";
+    $rc = -1; debugPrint 1, "failed to execute: $!";
     exit $rc;
   } elsif ($? & 127) {
     $rc = $? & 127;
@@ -356,7 +355,7 @@ sub docmd (@) {
     $rc = $? >> 8;
     if ($rc || ! $ret) {
       print STDOUT @stdout;
-      printmsg "child process exited with value $rc - Exiting!";
+      debugPrint 1, "child process exited with value $rc - Exiting!";
       exit $rc || $ret;
     }
   }

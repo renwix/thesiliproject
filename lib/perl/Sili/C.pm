@@ -71,7 +71,8 @@ the code is pulled from the Unix process tree code.
 
   my \$phase1 = new Sili::C( name => 'phase1',
                              doc => 'hello world',
-                             fn => sub [\$ast] { print Dumper($self), Dumper( \$ast ) } );
+                             fn => sub [\$ast] { print Dumper($self), 
+                                                 Dumper( \$ast ) } );
   $phase1->run();
 
 =head1 sili.pl TIEIN
@@ -87,11 +88,11 @@ then exec the \$silis in order.
 
 use Sili::Ness;
 use Sili::Q;
-use Sili::NamedParams classes => 1, debuglevel => 2;
+use Sili::NamedParams classes => 1;
 use Carp;
 use Data::Dumper;
 
-defineClass  # Sili::C
+defineClass
     isa => 'Sili::Ness',
     param( name => 'name',
            doc => 'The Name of the Sili::C phase.',

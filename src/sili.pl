@@ -172,7 +172,6 @@ use Data::Dumper;
 use Carp;
 $| = 0;
 
-
 sub _get_objs [$tag:required, $list:required] {
   return unless $tag;
   my @targets = query_by_type( type => $tag,
@@ -186,8 +185,8 @@ sub _get_objs [$tag:required, $list:required] {
 }
 
 sub choose_silis {
-
-  require $ENV{SILID} || CONFESS "Sili requires the SILID variable to be set: $@";
+  require $ENV{SILID} || 
+      CONFESS "Sili requires the SILID variable to be set: $@";
   debugPrint 1, $ENV{SILID}, " ", Dumper($silis);
   $silis || USAGE "specify \$silid in $ENV{SILID}";
 
@@ -211,7 +210,7 @@ sub choose_silis {
 sub show_silis { print STDERR Dumper( @_ ) }
 sub binpath { print "$ENV{SILIHOME}/share/thesiliproject/bin" }
 sub libpath { print "$ENV{SILIHOME}/share/thesiliproject/lib" }
-sub version { print "grrr" }
+sub version { print "0.01" }
 
 my @targets; my @packages;
 my $sili = $ENV{SILI};
@@ -236,7 +235,8 @@ $version && version() && exit 0;
 $choose_silis && choose_silis() && exit 0;
 
 # load the definition
-require $sili || CONFESS "Sili requires the SILI env var to be set: $@";
+require $sili || 
+    CONFESS "Sili requires the SILI env var to be set: $@";
 if ($show_silis == 1) {
   show_silis( $silis ) && exit 0;
 }
@@ -248,7 +248,8 @@ if ($compile) {
     if ($s &&
         $s->isa('Sili::C') &&
         $s->can('run')) {
-      push @$silis, grep { defined && $_->_failed_cnt == 1 } ( $s->run( ast => $ast ) );
+      push @$silis, grep { defined && $_->_failed_cnt == 1 } 
+                    ( $s->run( ast => $ast ) );
     }
   }
   exit 0;

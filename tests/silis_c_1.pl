@@ -30,7 +30,7 @@
 # /gpl
 
 use Sili::C permissive => 1;
-use Sili::NamedParams classes => 1; #, debuglevel => 1;
+use Sili::NamedParams classes => 1, debuglevel => 1;
 use Data::Dumper;
 
 sub tester {
@@ -39,14 +39,14 @@ sub tester {
 }
 
 
-my $thg1 = new Sili::C( name => 'nestedTest1',
-                        doc => 'hello world',
-#                        permissive => 1,
-                        fn => sub [$ast:ARRAY] {
-                          push @$ast, 'hi there from nested test1';
-                          print Dumper($self), Dumper( $ast );
-                          1;
-                        } );
+my $thg1 = new Sili::C(name => 'nestedTest1',
+                       doc => 'hello world',
+#                      permissive => 1,
+                       fn => sub [$ast:ARRAY] {
+                           push @$ast, 'hi there from nested test1';
+                           print Dumper($self), Dumper( $ast );
+                           1;
+                       });
 
 my $thg2 = new Sili::C( name => 'nestedTest2',
                         doc => 'hello world',
